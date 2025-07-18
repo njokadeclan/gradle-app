@@ -25,12 +25,15 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
 
-    - name: Build and Push Docker Image
-      uses: mr-smithers-excellent/docker-build-push@v6
-      with:
-        image: njokadeclan/gradelew-pro
-        registry: docker.io
-        dockerfile: Dockerfile     # Make sure Dockerfile is in the root
-        context: .                 # Root contains build/libs/my-app-1.0-SNAPSHOT.jar
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Build Docker Image manually
+      run: |
+        docker build -t java-app .
+        docker tag java-app njokadeclan:java-1.0
+
+    # Optional: Push the tagged image to Docker Hub
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Push Docker Image
+      run: |
+        docker push njokadeclan:java-1.0
